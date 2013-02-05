@@ -18,15 +18,15 @@
 		
 		private var _stream:NetStream;
 		private var _video:Video;
-		private var _draw:Draw = new Draw();
 		private var _util:Util;
 		private var _streamed:Boolean;
 		
-		private var _interval;
-		private var _currentTime;
-		private var _duration;
+		private var _interval:uint;
+		private var _currentTime:Number;
+		private var _duration:Number;
 				
 		public function jQPlayer() {
+			
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
 			
@@ -35,7 +35,6 @@
 			setupStream();
 			
 			setupVideo();
-			//createControls();
 			
 			_stream.addEventListener(NetStatusEvent.NET_STATUS, onStatus);
 			
@@ -64,8 +63,8 @@
 				_video.width = _video.videoWidth;
 				_video.height = _video.videoHeight;
 				
-				var x = stage.stageWidth/2 - _video.videoWidth/2;
-				var y = stage.stageHeight/2 - _video.videoHeight/2;
+				var x:Number = stage.stageWidth/2 - _video.videoWidth/2;
+				var y:Number = stage.stageHeight/2 - _video.videoHeight/2;
 				
 				if (x > 0) {
 					_video.x = x;
@@ -77,11 +76,9 @@
 			}
 		}
 		
-		function onMetaData(metadata:Object) {
-			var duration = metadata.duration;
-			_duration = duration;
-
-			
+		private function onMetaData(metadata:Object):void {
+			var duration:Number = metadata.duration;
+			_duration = duration;			
 		}
 		
 		private function playVideo():void {
@@ -108,20 +105,22 @@
 		}
 		
 		private function setTimeChangeEvent():void {
-			_interval = setInterval(function () {
-				_currentTime = _stream.time;
-			}, 100);
+			_interval = setInterval(setCurrentTime, 100);
+		}
+
+		private function setCurrentTime():void {
+			_currentTime = _stream.time;
 		}
 		
 		private function cancelTimeChangeEvent():void {
 			clearInterval(_interval);
 		}
 		
-		private function getCurrentTime() {
+		private function getCurrentTime():Number {
 			return _currentTime;
 		}
 		
-		private function getDuration() {
+		private function getDuration():Number {
 			_util.cl('duration ' + _duration);
 			if (_duration) {
 				return _duration;
@@ -129,18 +128,6 @@
 			
 			return 0;
 		}
-		
-		/*private function createControls() {
-			var width = 200;
-			var height = 24;
-			var x = stage.width/2 - width/2;
-			var y = stage.height - height;
-			var square = _draw.square(width, height, 0, null, 0xFF0000, x, y);
-			
-			//square.addEventListener(MouseEvent.CLICK, playVideos);
-			
-			addChild(square);
-		}*/
 		
 		private function bindEvents(ev:Event):void {
 			ExternalInterface.marshallExceptions = true;
