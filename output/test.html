@@ -16,10 +16,12 @@
 
 		<a href="javascript:;" id="play">Play</a>
 		<a href="javascript:;" id="pause">Pause</a>
+		<span id="currentTime"></span> / <span id="totalTime"></span>
 
 		<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 		<script>
+			var _interval;
 
 			function createFlash() {
 				var flashVars = {
@@ -51,6 +53,22 @@
 				$('#pause').on('click', function () {
 					flashObj.pause();
 				});
+			}
+
+			function onPlay() {
+				var flashObj = $('#jQPlayer').get(0);
+				var currentTime = $('#currentTime');
+				var totalTime = $('#totalTime');
+
+				_interval = setInterval(function () {
+					currentTime.html(flashObj.currentTime());
+				}, 100);
+
+				console.log(flashObj.duration());
+			}
+
+			function onPause() {
+				clearInterval(_interval);
 			}
 
 			$(window).ready(function () {

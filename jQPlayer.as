@@ -9,6 +9,10 @@
 	import flash.external.ExternalInterface;
 	import flash.system.Security;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.utils.setInterval;
+	import flash.utils.clearInterval;
+	import flashx.textLayout.formats.Float;
 	
 	public class jQPlayer extends MovieClip {
 		
@@ -17,6 +21,10 @@
 		private var _draw:Draw = new Draw();
 		private var _util:Util;
 		private var _streamed:Boolean;
+		
+		private var _interval;
+		private var _currentTime;
+		private var _duration;
 				
 		public function jQPlayer() {
 			Security.allowDomain("*");
@@ -39,6 +47,9 @@
 			connection.connect(null);
 			
 			_stream = new NetStream(connection);
+			
+			_stream.client = {}
+			_stream.client.onMetaData = onMetaData;
 		}
 		
 		private function setupVideo():void {
@@ -66,6 +77,13 @@
 			}
 		}
 		
+		function onMetaData(metadata:Object) {
+			var duration = metadata.duration;
+			_duration = duration;
+
+			
+		}
+		
 		private function playVideo():void {
 			if (_streamed) {
 				_util.cl("resume video");
@@ -76,11 +94,40 @@
 				_stream.play(_util.getFlashVar('video'));
 				_streamed = true;
 			}
+			
+			ExternalInterface.call("onPlay");
+			setTimeChangeEvent();
 		}
 		
 		private function pauseVideo():void {
+			cancelTimeChangeEvent();
 			_util.cl("pause video");
 			_stream.pause();
+			
+			ExternalInterface.call("onPause");
+		}
+		
+		private function setTimeChangeEvent():void {
+			_interval = setInterval(function () {
+				_currentTime = _stream.time;
+			}, 100);
+		}
+		
+		private function cancelTimeChangeEvent():void {
+			clearInterval(_interval);
+		}
+		
+		private function getCurrentTime() {
+			return _currentTime;
+		}
+		
+		private function getDuration() {
+			_util.cl('duration ' + _duration);
+			if (_duration) {
+				return _duration;
+			}
+			
+			return 0;
 		}
 		
 		/*private function createControls() {
@@ -99,6 +146,8 @@
 			ExternalInterface.marshallExceptions = true;
 			ExternalInterface.addCallback("play", playVideo);
 			ExternalInterface.addCallback("pause", pauseVideo);
+			ExternalInterface.addCallback("currentTime", getCurrentTime);
+			ExternalInterface.addCallback("duration", getDuration);
 		}
 	}
 }
