@@ -23,10 +23,8 @@
 			Security.allowInsecureDomain("*");
 			
 			_util = new Util(this.root);
-			var connection:NetConnection = new NetConnection();
-			connection.connect(null);
 			
-			_stream = new NetStream(connection);
+			setupStream();
 			
 			setupVideo();
 			//createControls();
@@ -36,15 +34,18 @@
 			addEventListener(Event.ADDED_TO_STAGE, bindEvents);
 		}
 		
-		private function setupVideo() {
+		private function setupStream():void {
+			var connection:NetConnection = new NetConnection();
+			connection.connect(null);
+			
+			_stream = new NetStream(connection);
+		}
+		
+		private function setupVideo():void {
 			_video = new Video();
 			addChild(_video);
 			
-			ExternalInterface.call( "console.log" , "Stage: " + stage.width);
-			
 			_video.attachNetStream(_stream);
-			/*_video.width = stage.stageWidth;
-			_video.height = stage.stageHeight;*/
 		}
 		
 		private function onStatus(event:NetStatusEvent):void {
@@ -67,18 +68,18 @@
 		
 		private function playVideo():void {
 			if (_streamed) {
-				ExternalInterface.call( "console.log" , "Resume Video");
+				_util.cl("resume video");
 				_stream.resume();
 			}
 			else {
-				ExternalInterface.call( "console.log" , "Play Video");
+				_util.cl("play video");
 				_stream.play(_util.getFlashVar('video'));
 				_streamed = true;
 			}
 		}
 		
 		private function pauseVideo():void {
-			ExternalInterface.call( "console.log" , "Pause Video");
+			_util.cl("pause video");
 			_stream.pause();
 		}
 		
@@ -95,7 +96,6 @@
 		}*/
 		
 		private function bindEvents(ev:Event):void {
-			ExternalInterface.call( "console.log" , "Hey! I'm tracing from External!");
 			ExternalInterface.marshallExceptions = true;
 			ExternalInterface.addCallback("play", playVideo);
 			ExternalInterface.addCallback("pause", pauseVideo);

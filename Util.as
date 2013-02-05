@@ -15,6 +15,10 @@
 			var paramObj:Object = LoaderInfo(_rootObject.loaderInfo).parameters;
 			return paramObj[prop];
 		}
+		
+		public function cl(message) {
+			ExternalInterface.call( "console.log" , message);
+		}
 
 	}
 	
