@@ -1,0 +1,1 @@
+mxmlc -static-link-runtime-shared-libraries=true -source-path+=src/ -output=bin/jQPlayer-Flash.swf -- src/jQPlayer.as

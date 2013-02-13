@@ -6,7 +6,6 @@
 		<style type="text/css" media="screen">
 		html, body { height:100%; background-color: #ffffff;}
 		body { margin:0; padding:0; overflow:hidden; }
-		#jQPlayer { width:550px; height:400px; }
 		</style>
 	</head>
 	<body>
@@ -16,12 +15,13 @@
 
 		<a href="javascript:;" id="play">Play</a>
 		<a href="javascript:;" id="pause">Pause</a>
-		<span id="currentTime"></span> / <span id="totalTime"></span>
+		<span id="currentTime">--</span> / <span id="totalTime">--</span>
 
 		<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 		<script>
-			var _interval;
+			var _interval,
+				flashObj;
 
 			function createFlash() {
 				var flashVars = {
@@ -38,13 +38,13 @@
 					name: "jQPlayer"
 				};
 
-				swfobject.embedSWF("jQPlayer-Flash.swf", "flashContent", "0", "0", "9.0.0", "", flashVars, params, attributes, function () {
+				swfobject.embedSWF("jQPlayer-Flash.swf", "flashContent", "550", "400", "9.0.0", "", flashVars, params, attributes, function () {
 					bind();
 				});
 			}
 
 			function bind() {
-				var flashObj = $('#jQPlayer').get(0);
+				flashObj = $('#jQPlayer').get(0);
 
 				$('#play').on('click', function () {
 					flashObj.play();
@@ -56,7 +56,6 @@
 			}
 
 			function onPlay() {
-				var flashObj = $('#jQPlayer').get(0);
 				var currentTime = $('#currentTime');
 				var totalTime = $('#totalTime');
 
@@ -64,7 +63,15 @@
 					currentTime.html(flashObj.currentTime());
 				}, 100);
 
-				console.log(flashObj.duration());
+				totalTime.html(flashObj.duration());
+			}
+
+			function seekTo(time) {
+				flashObj.seekTo(time);
+			}
+
+			function onEnd() {
+				console.log('ended');
 			}
 
 			function onPause() {
