@@ -25,7 +25,8 @@
 
 			function createFlash() {
 				var flashVars = {
-					video: 'demo.flv'
+					video: 'demo.flv',
+					loaded: 'onLoaded'
 				};
 
 				var params = {
@@ -53,7 +54,9 @@
 				$('#pause').on('click', function () {
 					flashObj.pause();
 				});
+			}
 
+			function onLoaded() {
 				flashObj.addPlayerEvent("play", "onPlay");
 				flashObj.addPlayerEvent("end", "onEnd");
 				flashObj.addPlayerEvent("pause", "onPause");

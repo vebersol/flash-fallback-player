@@ -34,7 +34,6 @@
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 
-			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
 			_util = new Util(this.root);
 			
 			setupStream();
@@ -129,6 +128,11 @@
 			ExternalInterface.addCallback("currentTime", getCurrentTime);
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
+
+			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
+
+			if (_util.getFlashVar('loaded'))
+				ExternalInterface.call(_util.getFlashVar('loaded'));
 		}
 
 		private function bind():void {
