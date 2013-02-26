@@ -18,14 +18,15 @@
 		<span id="currentTime">--</span> / <span id="totalTime">--</span>
 
 		<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 		<script>
 			var _interval,
 				flashObj;
 
 			function createFlash() {
 				var flashVars = {
-					video: 'media/sample360p.flv'
+					video: 'demo.flv',
+					loaded: 'onLoaded'
 				};
 
 				var params = {
@@ -53,6 +54,12 @@
 				$('#pause').on('click', function () {
 					flashObj.pause();
 				});
+			}
+
+			function onLoaded() {
+				flashObj.addPlayerEvent('play', 'onPlay');
+				flashObj.addPlayerEvent('end', 'onEnd');
+				flashObj.addPlayerEvent('pause', 'onPause');
 			}
 
 			function onPlay() {

@@ -17,6 +17,7 @@
 	
 	public class jQPlayer extends MovieClip {
 		
+		private var _jsDispatcher:JSEventDispatcher;
 		private var _stream:NetStream;
 		private var _video:Video;
 		private var _util:Util;
@@ -70,11 +71,11 @@
 
 			if (event.info.code == 'NetStream.Play.Start') {
 				resizeVideo();
-				ExternalInterface.call("onPlay");
+				_jsDispatcher.dispatch("play");
 			}
 
 			if (event.info.code == 'NetStream.Play.Stop') {
-				ExternalInterface.call("onEnd");
+				_jsDispatcher.dispatch("end");
 				_streamed = false;
 			}
 			
@@ -101,7 +102,7 @@
 			_util.cl("pause video");
 			_stream.pause();
 			
-			ExternalInterface.call("onPause");
+			_jsDispatcher.dispatch("pause");
 		}
 				
 		private function getCurrentTime():Number {
@@ -127,6 +128,11 @@
 			ExternalInterface.addCallback("currentTime", getCurrentTime);
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
+
+			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
+
+			if (_util.getFlashVar('loaded'))
+				ExternalInterface.call(_util.getFlashVar('loaded'));
 		}
 
 		private function bind():void {
