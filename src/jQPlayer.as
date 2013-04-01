@@ -6,6 +6,9 @@
 	import flash.events.NetStatusEvent;
 	import flash.events.MouseEvent;
 	import flash.media.Video;
+	import flash.media.Sound;
+    	import flash.media.SoundChannel;
+    	import flash.media.SoundTransform;
 	import flash.external.ExternalInterface;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
@@ -26,6 +29,7 @@
 		private var _interval:uint;
 		private var _currentTime:Number;
 		private var _duration:Number;
+		private var _soundTransform:SoundTransform;
 				
 		public function jQPlayer() {
 			Security.allowDomain("*");
@@ -35,6 +39,8 @@
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 
 			_util = new Util(this.root);
+
+			_soundTransform = new SoundTransform(0);
 			
 			setupStream();
 			setupVideo();
@@ -128,6 +134,7 @@
 			ExternalInterface.addCallback("currentTime", getCurrentTime);
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
+			ExternalInterface.addCallback("volume", setVolume);
 
 			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
 
@@ -149,6 +156,12 @@
 				_video.width = stage.stageWidth;
 				_video.height = stage.stageHeight;
 			}
+		}
+
+		public function setVolume(vol:Number):void {
+			_stream.soundTransform = _soundTransform;
+			_soundTransform.volume = vol;
+			_stream.soundTransform = _soundTransform;
 		}
 	}
 }
