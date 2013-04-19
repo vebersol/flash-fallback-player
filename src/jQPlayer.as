@@ -30,6 +30,7 @@
 		private var _currentTime:Number;
 		private var _duration:Number;
 		private var _soundTransform:SoundTransform;
+		private var _isPaused:Boolean;
 				
 		public function jQPlayer() {
 			Security.allowDomain("*");
@@ -59,6 +60,8 @@
 			
 			_stream.client = {}
 			_stream.client.onMetaData = onMetaData;
+
+			_isPaused = true;
 		}
 		
 		private function setupVideo():void {
@@ -102,6 +105,9 @@
 				_stream.play(_util.getFlashVar('video'));
 				_streamed = true;
 			}
+
+			_isPaused = false;
+			ExternalInterface.call('function () { jQuery(document).trigger("flash.play"); }');
 		}
 		
 		private function pauseVideo():void {
@@ -109,6 +115,9 @@
 			_stream.pause();
 			
 			_jsDispatcher.dispatch("pause");
+
+			_isPaused = true;
+			ExternalInterface.call('function () { jQuery(document).trigger("flash.pause"); }');
 		}
 				
 		private function getCurrentTime():Number {
@@ -135,11 +144,13 @@
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
 			ExternalInterface.addCallback("volume", setVolume);
+			ExternalInterface.addCallback("paused", isPaused);
 
 			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
 
-			if (_util.getFlashVar('loaded'))
-				ExternalInterface.call(_util.getFlashVar('loaded'));
+			if (_util.getFlashVar('loaded')) {
+				ExternalInterface.call('function () { jQuery(document).trigger("flash.loaded"); }');
+			}
 		}
 
 		private function bind():void {
@@ -162,6 +173,10 @@
 			_stream.soundTransform = _soundTransform;
 			_soundTransform.volume = vol;
 			_stream.soundTransform = _soundTransform;
+		}
+
+		public function isPaused():Boolean {
+			return _isPaused;
 		}
 	}
 }
