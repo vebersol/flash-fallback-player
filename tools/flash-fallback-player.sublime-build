@@ -1,0 +1,12 @@
+{
+	"cmd": [
+		"mxmlc",
+		"-static-link-runtime-shared-libraries=true",
+		"-output=bin/jQPlayer.swf",//"-output=../jQPlayer/media/jQPlayer.swf",
+		"--", "src/jQPlayer.as"
+
+	],
+	"selector": "source.actionscript",
+	"working_dir": "E:/workspace/flash-fallback-player/",
+	"shell": true
+}
