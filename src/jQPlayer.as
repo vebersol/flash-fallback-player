@@ -22,6 +22,8 @@
 		
 		private var _jsDispatcher:JSEventDispatcher;
 		private var _stream:NetStream;
+		private var _buffer_interval:Number;
+		private var _buffered:Number;
 		private var _video:Video;
 		private var _util:Util;
 		private var _streamed:Boolean;
@@ -64,6 +66,8 @@
 			_stream.client.onMetaData = onMetaData;
 
 			_isPaused = true;
+
+			setupBuffer();
 		}
 		
 		private function setupVideo():void {
@@ -75,6 +79,20 @@
 			// preload video
 			_stream.play(_util.getFlashVar('video'));
 			_stream.pause();
+		}
+
+		private function setupBuffer():void {
+			_buffer_interval = setInterval(setBufferInfo, 100, _stream);
+		}
+
+		private function setBufferInfo(ns:NetStream):Number {
+			_buffered = ns.bytesLoaded / ns.bytesTotal;
+
+			if (_buffered >= 1) {
+				clearInterval(_buffer_interval);
+			}
+
+			return _buffered;
 		}
 		
 		private function onStatus(event:NetStatusEvent):void {
@@ -151,6 +169,7 @@
 			ExternalInterface.addCallback("paused", isPaused);
 			ExternalInterface.addCallback("resize", resizeVideo);
 			ExternalInterface.addCallback("changeVideo", changeVideo);
+			ExternalInterface.addCallback("getBuffer", getBuffer);
 
 			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
 
@@ -202,6 +221,14 @@
 			_currentTime = 0;
 
 			ExternalInterface.call('function () { jQuery(document).trigger("flash.videoChanged"); }');
+		}
+
+		public function getBuffer():Number {
+			if (_buffered) {
+				return _buffered;
+			}
+
+			return 0;
 		}
 	}
 }

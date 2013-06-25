@@ -17,7 +17,7 @@
 		}
 		
 		public function cl(message:String):void {
-			ExternalInterface.call( "console.log" , message);
+			//ExternalInterface.call( "console.log" , message);
 		}
 
 	}
