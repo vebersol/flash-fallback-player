@@ -28,6 +28,7 @@
 		
 		private var _interval:uint;
 		private var _currentTime:Number;
+		private var _currentVolume:Number;
 		private var _duration:Number;
 		private var _soundTransform:SoundTransform;
 		private var _isPaused:Boolean;
@@ -48,6 +49,7 @@
 			bind();
 			
 			_stream.addEventListener(NetStatusEvent.NET_STATUS, onStatus);
+			stage.addEventListener(Event.RESIZE, resizeListener);
 			
 			addEventListener(Event.ADDED_TO_STAGE, bindExternalEvents);
 		}
@@ -134,6 +136,7 @@
 
 		private function seekTo(time:Number):void {
 			_stream.seek(time);
+			ExternalInterface.call('function () { jQuery(document).trigger("flash.seeked"); }');
 		}
 		
 		private function bindExternalEvents(ev:Event):void {
@@ -144,13 +147,14 @@
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
 			ExternalInterface.addCallback("volume", setVolume);
+			ExternalInterface.addCallback("getVolume", getVolume);
 			ExternalInterface.addCallback("paused", isPaused);
+			ExternalInterface.addCallback("resize", resizeVideo);
+			ExternalInterface.addCallback("changeVideo", changeVideo);
 
 			_jsDispatcher = new JSEventDispatcher("addPlayerEvent", "removePlayerEvent");
 
-			if (_util.getFlashVar('loaded')) {
-				ExternalInterface.call('function () { jQuery(document).trigger("flash.loaded"); }');
-			}
+			ExternalInterface.call('function () { jQuery(document).trigger("flash.loaded"); }');
 		}
 
 		private function bind():void {
@@ -163,20 +167,41 @@
 
 		public function resizeVideo():void {
 			_util.cl('resizeVideo');
-			if (_video.videoWidth > 0 && _video.width != _video.videoWidth) {
-				_video.width = stage.stageWidth;
-				_video.height = stage.stageHeight;
-			}
+			
+			_video.width = stage.stageWidth;
+			_video.height = stage.stageHeight;
+		}
+
+		private function resizeListener(e:Event):void {
+			resizeVideo();
 		}
 
 		public function setVolume(vol:Number):void {
 			_stream.soundTransform = _soundTransform;
 			_soundTransform.volume = vol;
 			_stream.soundTransform = _soundTransform;
+			_currentVolume = vol;
+		}
+
+		public function getVolume():Number {
+			if (!_currentVolume) {
+				_currentVolume = 1;
+			}
+
+			return _currentVolume;
 		}
 
 		public function isPaused():Boolean {
 			return _isPaused;
+		}
+
+		public function changeVideo(source:String):void {
+			_stream.play(source);
+			_stream.pause();
+
+			_currentTime = 0;
+
+			ExternalInterface.call('function () { jQuery(document).trigger("flash.videoChanged"); }');
 		}
 	}
 }
