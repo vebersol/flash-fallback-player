@@ -100,12 +100,13 @@
 
 			if (event.info.code == 'NetStream.Play.Start') {
 				resizeVideo();
-				_jsDispatcher.dispatch("play");
+				_jsDispatcher.dispatch("_play");
 			}
 
 			if (event.info.code == 'NetStream.Play.Stop') {
-				_jsDispatcher.dispatch("end");
+				//_jsDispatcher.dispatch("end");
 				_streamed = false;
+				ExternalInterface.call('function () { jQuery(document).trigger("flash.end"); }');
 			}
 			
 		}
@@ -134,7 +135,7 @@
 			_util.cl("pause video");
 			_stream.pause();
 			
-			_jsDispatcher.dispatch("pause");
+			_jsDispatcher.dispatch("_pause");
 
 			_isPaused = true;
 			ExternalInterface.call('function () { jQuery(document).trigger("flash.pause"); }');
@@ -159,8 +160,8 @@
 		
 		private function bindExternalEvents(ev:Event):void {
 			ExternalInterface.marshallExceptions = true;
-			ExternalInterface.addCallback("play", playVideo);
-			ExternalInterface.addCallback("pause", pauseVideo);
+			ExternalInterface.addCallback("_play", playVideo);
+			ExternalInterface.addCallback("_pause", pauseVideo);
 			ExternalInterface.addCallback("currentTime", getCurrentTime);
 			ExternalInterface.addCallback("duration", getDuration);
 			ExternalInterface.addCallback("seekTo", seekTo);
